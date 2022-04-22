@@ -15,9 +15,10 @@
 # limitations under the License.
 
 ktx() {
+
     # Test that we have a $HOME/.kube to work with
     if [ ! -d "${HOME}/.kube" ]; then
-        echo "echo \"The following directory does not exist: ${HOME}/.kube. Exiting...\""
+        echo "echo \"The default kubeconfig directory does not exist: ${HOME}/.kube. Exiting...\""
         return 1
     fi
 
@@ -27,13 +28,24 @@ ktx() {
         return 1
     fi
 
-    # If no argument was given then list the files in $HOME/.kube
+    # If no argument was given then list found configs
     if [ -z "$1" ]; then
+      # List the files in $HOME/.kube
       for kube in $(find "${HOME}/.kube" -maxdepth 1 -type f -o -type l); do
         if [[ "${KUBECONFIG}" == "$kube" ]]; then
           echo -n "(active) "
         fi
         echo $(basename "${kube}")
+      done
+
+      # List files in current directory (rudimentary check if they are kubeconfig files)
+      for kube in $(find "$(pwd)" -maxdepth 1 -type f -o -type l); do
+        if grep -qix -m 1 "kind: config" "$kube"; then
+          if [[ "${KUBECONFIG}" == "$kube" ]]; then
+            echo -n "(active) "
+          fi
+          echo $(basename "${kube}")    \(in $(pwd)\)
+        fi
       done
 
       return
@@ -48,8 +60,11 @@ ktx() {
     # Verify config exists
     if [ -e "${HOME}/.kube/${1}" ]; then
         export KUBECONFIG="${HOME}/.kube/${1}"
+    elif [ -e "$(pwd)/${1}" ]; then
+        export KUBECONFIG="$(pwd)/${1}"
     else
-        echo "echo \"The following file does not exist: ${HOME}/.kube/${1}. Exiting...\""
+        echo "echo \"The following kubeconfig does not exist: ${1}. Exiting...\""
         return 1
     fi
 }
+

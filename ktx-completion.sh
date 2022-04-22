@@ -1,3 +1,4 @@
+
 #!/usr/bin/env bash
 
 # Copyright 2017 Heptio Inc.
@@ -18,7 +19,13 @@ KUBECONFIG_DIR=${KUBECONFIG_DIR:-"${HOME}/.kube/"}
 
 _getconf()
 {
-       find ${KUBECONFIG_DIR} -maxdepth 1 \( -type f -o -type l \) -exec basename {} \;
+  find ${KUBECONFIG_DIR} -maxdepth 1 \( -type f -o -type l \) -exec basename {} \;
+
+  for kube in $(find "$(pwd)" -maxdepth 1 -type f -o -type l); do
+    if grep -qix -m 1 "kind: config" "$kube"; then
+      echo $(basename "${kube}")
+    fi
+  done
 }
 
 _ktx() {
