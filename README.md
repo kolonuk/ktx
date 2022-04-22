@@ -12,6 +12,8 @@ Managing kubeconfig files can become tedious when you have multiple clusters and
 
 * Your shell is bash or zsh.
 * `git` is installed.
+* `grep`
+* `find`
 
 ### Install
 
