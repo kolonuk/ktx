@@ -24,8 +24,9 @@ ktx() {
 
     # Verify our $HOME/.kube isn't empty
     if [ -z "$(ls -A ${HOME}/.kube)" ]; then
-        echo "echo \"No configs present in ${HOME}/.kube. Exiting...\""
-        return 1
+        #echo "echo \"No configs present in ${HOME}/.kube. Exiting...\""
+        #return 1
+        touch ${HOME}/.kube/default.yml
     fi
 
     # If no argument was given then list found configs
